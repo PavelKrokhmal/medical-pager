@@ -1,12 +1,12 @@
 import React from 'react'
 import {ChannelList, useChatContext} from 'stream-chat-react'
-import Cookies from 'universal-cookie'
+import {cookies} from '../utils'
 
 import {ChannelSearch, TeamChannelList, TeamChannelPreview} from './'
 import HospitalIcon from '../assets/hospital.png'
 import LogoutIcon from '../assets/logout.png'
 
-const SideBar = () => (
+const SideBar = ({logout}) => (
   <div className='channel-list__sidebar'>
     <div className='channel-list__sidebar__icon1'>
       <div className='icon1__inner'>
@@ -14,7 +14,7 @@ const SideBar = () => (
       </div>
     </div>
     <div className='channel-list__sidebar__icon2'>
-      <div className='icon1__inner'>
+      <div className='icon1__inner' onClick={logout}>
         <img src={LogoutIcon} alt='Logout' width={30}/>
       </div>
     </div>
@@ -28,9 +28,16 @@ const CompanyHeader = () => (
 )
 
 const ChannelListContainer = () => {
+  const logout = () => {
+    cookies.removeCookies([
+      'token', 'userId', 'username', 'fullName', 'avatarURL', 'phoneNumber', 'hashedPassword'
+    ])
+    window.location.reload()
+  }
+
   return (
     <>
-      <SideBar/>
+      <SideBar logout={logout}/>
       <div className='channel-list__list__wrapper'>
         <CompanyHeader/>
         <ChannelSearch/>

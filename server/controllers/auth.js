@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 const {connect} = require('getstream')
 const bcrypt = require('bcrypt')
-const StreamChat = require('stream-chat')
+const StreamChat = require('stream-chat').StreamChat
 
 const apiKey = process.env.STREAM_API_KEY
 const apiSecret = process.env.STREAM_API_SECRET
@@ -36,7 +36,7 @@ const login = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const {fullName, username, phoneNumber, password} = req.body
+    const {fullName, username, phoneNumber, avatarURL, password} = req.body
     const userId = crypto.randomBytes(16).toString('hex')
     const serverClient = connect(apiKey, apiSecret, apiId)
     const hashedPassword = await bcrypt.hash(password, 4)
@@ -45,7 +45,7 @@ const signup = async (req, res) => {
     res.status(200).json({token, fullName, username, phoneNumber, userId, hashedPassword})
   } catch (error) {
     console.log(error)
-    res.status(500).json({message: error})
+    res.status(500).json({message: error.message})
   }
 }
 

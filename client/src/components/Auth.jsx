@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
-import Cookies from 'universal-cookie'
-import axios from 'axios'
+import {cookies} from '../utils'
+import {auth} from '../api'
 
 import signupImage from '../assets/signup.jpg'
 
@@ -13,14 +13,32 @@ const initialForm = {
   confirmPassword: ''
 }
 
+const authSignupOrLogin = async (isSignup, data) => {
+  const {fullName, username, phoneNumber, avatarURL, password, confirmPassword} = data
+  if (isSignup) {
+    return await auth.signup({
+      fullName,
+      username,
+      phoneNumber,
+      avatarURL,
+      password
+    })
+  } else {
+    return await auth.login({
+      username,
+      password
+    })
+  }
+}
+
 const Auth = () => {
   const [form, setForm] = useState(initialForm)
-  const [isSignup, setIsSignup] = useState(true)
+  const [isSignup, setIsSignup] = useState(false)
 
   const handleChange = event => {
     setForm(prevState => ({
       ...prevState,
-        [event.target.name]: event.target.value
+      [event.target.name]: event.target.value
     }))
   }
 
@@ -28,11 +46,38 @@ const Auth = () => {
     setIsSignup(prevState => !prevState)
   }
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault()
 
-    console.log(form)
+    const {fullName, username, phoneNumber, avatarURL, password, confirmPassword} = form
 
+    if (isSignup && password !== confirmPassword) {
+      alert('Please, confirm password!')
+      return
+    }
+
+    try {
+      const {data: {token, userId, hashedPassword}} = await authSignupOrLogin(isSignup, form)
+
+      cookies.setCookies([
+        {key: 'token', value: token},
+        {key: 'username', value: username},
+        {key: 'fullName', value: fullName},
+        {key: 'userId', value: userId}
+      ])
+
+      if (isSignup) {
+        cookies.setCookies([
+          {key: 'phoneNumber', value: phoneNumber},
+          {key: 'avatarURL', value: avatarURL},
+          {key: 'hashedPassword', value: hashedPassword}
+        ])
+      }
+
+      window.location.reload()
+    } catch (error) {
+      console.log(error.message)
+    }
   }
 
   return (
@@ -70,7 +115,8 @@ const Auth = () => {
             {isSignup && (
               <div className='auth__form-container_fields-content_input'>
                 <label htmlFor='confirmPassword'>Confirm password</label>
-                <input name='confirmPassword' type='password' placeholder='Confirm password' onChange={handleChange} required/>
+                <input name='confirmPassword' type='password' placeholder='Confirm password' onChange={handleChange}
+                       required/>
               </div>
             )}
             <div className='auth__form-container_fields-content_button'>
