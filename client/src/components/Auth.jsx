@@ -49,7 +49,7 @@ const Auth = () => {
   const handleSubmit = async event => {
     event.preventDefault()
 
-    const {fullName, username, phoneNumber, avatarURL, password, confirmPassword} = form
+    const {username, phoneNumber, avatarURL, password, confirmPassword} = form
 
     if (isSignup && password !== confirmPassword) {
       alert('Please, confirm password!')
@@ -57,7 +57,7 @@ const Auth = () => {
     }
 
     try {
-      const {data: {token, userId, hashedPassword}} = await authSignupOrLogin(isSignup, form)
+      const {data: {token, userId, hashedPassword, fullName}} = await authSignupOrLogin(isSignup, form)
 
       cookies.setCookies([
         {key: 'token', value: token},
