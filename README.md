@@ -1,4 +1,4 @@
-# Full Stack Realtime Chat Messaging App with Authentication & SMS Notifications
+# Full Stack Realtime Chat Messaging App with Authentication & Twilio SMS Notifications
 
 Stack: Stream
 
